@@ -1,0 +1,198 @@
+---
+title: "overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mldesign)
+```
+
+
+
+
+
+## Main functionality
+
+The {mldesign} package allows meaningful data splitting for supervised machine learning tasks. 
+The data splitting in {mldesign} is based on an **estimand** definition which is in turn based
+on user-specified constraints.
+
+**Constraints** can be thought of generalized inclusion/exclusion criteria for 
+
+1. Test observations
+2. The relation between observations in train and test set
+3. The training dataset(s)
+
+In contrast to traditional techniques (hold-out, cross-validation, bootstrap), this leads to a
+deterministic data splitting. The most important functions and classes are illustrated below:
+
+```{r, setup2, include=FALSE}
+library(nomnoml)
+```
+
+```{nomnoml, echo=FALSE, svg=TRUE, width="8in", height="8in"}
+#direction: down
+#stroke: black
+#.frame: bold
+#.obj: stroke=blue
+#.fun: stroke=#ff8c00 visual=roundrect bold
+
+
+[<frame> mldesign workflow for estimand-based data splitting|
+  [<fun> constrain : function]
+  [<fun> constrain : function] out -> [c1: mldesign_constraint]
+  [<fun> constrain : function] out -> [c2: mldesign_constraint]
+  [<fun> constrain : function] out -> [c3: mldesign_constraint]
+  [c1: mldesign_constraint | name = "ic_age" | expr = "test$age >= 18" | vars = "age" | type = "population" | target = "test"]
+  [c2: mldesign_constraint | name = "temporal_transferability" | expr = "test$year - train$year >= 1" | vars = "year" | type = "context" | target = "relation"]
+  [c3: mldesign_constraint | name = "sufficient n_train" | expr = "nrow(train) >= 100" | vars = "" | type = "admissibility" | target = "train"]
+  [c1: mldesign_constraint] in --> [<fun> specify_estimand : function]
+  [c2: mldesign_constraint] in --> [specify_estimand : function]
+  [c3: mldesign_constraint] in --> [specify_estimand : function] 
+ 
+  [specify_estimand : function] out -> [my_estimand: mldesign_estimand | test = list(c1, ...) |  relation = list(c2, ...) |  train = list(c3, ...) ]
+ 
+  [my_data: data.frame] in --> [<fun> derive_splits : function]
+  [my_estimand: mldesign_estimand] in --> [derive_splits : function]
+ 
+  [derive_splits : function] out -> [my_splits: mldesign_splits]
+ 
+  [my_data: data.frame] in --> [<fun> get_data_split : function]
+  [my_splits: mldesign_splits | list(\n list(train, test),\n list(train, test),\n ...\n) ] in --> [<fun> get_data_split : function]
+  [index: integer] in --> [<fun> get_data_split : function]
+  
+  [get_data_split : function] out -> [my_data_split: list | train: data.frame | test: data.frame]
+ 
+]
+```
+
+## Custom classes
+
+1. **mldesign_constraint**: a single constraint
+2. **mldesign_constraints**: a collection of constraints
+3. **mldesign_estimand** (subclass of mldesign_spec): three constraints objects *test*, *relation*, *train*
+4. **mldesign_splits**: a list of all train/test indices
+
+
+## Important functions
+
+1. **constrain()**: to define a constraint
+2. **parse_constraint()**: to define a constraint only based on a single string
+3. **combine_constraints()**: to combine multiple constraints
+4. **specify_estimand()**: to define an estimand
+5. **derive_splits(spec, data)**: to conduct the data splitting based on the estimand specification, returns indices only
+6. **split_data(splits, data, split_id)**: to get a single train/set split, return data sets (subsets of original data)
+
+## Overview
+
+The following diagram shows important relationships between objects (of relevant classes) and functions
+implemented in the {mldesign} package.
+
+
+
+
+
+## Example
+
+### Constraints
+
+Generate some data for demonstration purposes
+```{r}
+set.seed(1337)
+data <- generate_data(n_obs=2000)
+names(data)
+head(data)
+```
+
+Imagine we would want to apply our (trained) prediction model to predict the response variable only 
+to patients older than 50 years:
+
+```{r}
+constrain(~ test$age > 50)
+```
+Note that variables in this expression will automatically be recognized as long as the syntax 
+`test[['age']]` (preferred) or `test$age` (alternative, can cause problems in some cases) is
+used. Currently, detection of variables is still in an early stage via `detect_vars()` 
+but can be overwritten via (e.g.) `constrain(..., vars = "age")`.
+
+We can define further (optional) information. This will not affect results down the line but 
+will improve documentation
+```{r}
+constrain(~ test$age > 50, name="ic_age", type="population")
+```
+
+Note that we can specify the same constraint in a single character object with help of the parse_constraint function:
+
+```{r}
+"test[['age']] > 50 #name=ic_age #type=population" %>% parse_constraints()
+```
+Note that the use of the "#" character to specify further argument of constrain().
+
+The function combine_constraints() (shortcut: cc()) can be used to bundle multiple mldesign_constraint
+objects into a single mldesign_constraints object. 
+It can also handle character inputs (via parse_constraint) or mldesign_constraints inputs.
+
+
+### Estimand specification
+
+To define a first, simple estimand, let's focus on the *relation* constraints. These constraints 
+define the relationship between test and training observations. In this case, we specify constraints
+that we expect to hold between training dataset **train** and testing dataset **test**. Note, that these
+datasets do not yet exist explicitly but rather will be derived later 
+(possibly in multiple versions) based on our estimand
+specification and our entire dataset **data**.
+
+
+```{r}
+constraints_relation <- cc(
+  constrain(~ (test[['year']] - train[['year']]) %in% 1:2,
+            name="time_transferability", type="context"),
+  constrain(~ test[['country']] != train[['country']],
+            name="region_transferability", type="context")
+) 
+```
+
+```{r}
+constraints_relation %>% str(2)
+```
+```{r}
+my_estimand <- specify_estimand(constraints = constraints_relation,
+                                name = "my_estimand")
+my_estimand
+```
+
+
+
+
+### Data splitting 
+
+Now, we use the estimand to conduct (deterministically) the corresponding data splitting:
+
+```{r}
+splits <- derive_splits(my_estimand, data) 
+```
+
+```{r}
+length(splits)
+str(splits[[1]])
+```
+As we can see, we obtain a list of train/test indices corresponding to the estimand specification.
+To finally obtain concrete train/test sets (the first one out of the overall list):
+
+```{r}
+split_data(data, splits, idx=1) %>% str()
+```
+
+
+
