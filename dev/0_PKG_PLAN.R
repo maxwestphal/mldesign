@@ -18,6 +18,8 @@
 # ISSUES (0.2.0) ------------------------------------------------------------------------------
 # -> AFTER BiomColl2024: functionality
 
+# TODO: data.table refactoring
+
 # TODO: splitting functions cv, holdout, etc. should they be in dictonary instead of "global" funs?
 # TODO: summary object (ntrain, ntest) and which vars_relation are included in test set per split
 # which obs_idx are in none, multiple test sets

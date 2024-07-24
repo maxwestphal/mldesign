@@ -44,3 +44,10 @@ define_splits <- function(splits){
     add_class("mldesign_splits") %>%
     return()
 }
+
+
+define_method <- function(name, method, args){
+  list(name=name, method=method, args=args) %>%
+    add_class("mldesign_method") %>%
+    add_class("mldesign_spec")
+}
