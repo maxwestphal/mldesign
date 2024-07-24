@@ -1,7 +1,16 @@
-valid_methods <- c("cv", "extensive_cv")
+valid_methods <- c("holdout", "cv", "extensive_cv")
+
+holdout <- function(data, pr_test=0.2, strata=NULL){
+
+  folds <- draw_folds(data, n_folds=2, strata=strata, fold_size = c(1-pr_test, pr_test))
+  names(folds) <- c("train", "test")
+
+  return(list(folds))
+}
+
 
 #' @importFrom splitTools partition
-cv <- function(data, n_folds=5, strata=NULL){
+cv <- function(data, n_folds=5, strata=NULL, include_all_train = FALSE){
 
   folds <- draw_folds(data=data, n_folds=n_folds, strata=strata)
   n_obs <- nrow(data)
@@ -14,6 +23,11 @@ cv <- function(data, n_folds=5, strata=NULL){
   colnames(fi) <- paste0("fold_", LETTERS[1:n_folds])
   fold_info <- cbind(split_idx = 1:n_folds, as.data.frame(fi))
 
+  if(include_all_train){
+    splits[[length(splits)+1]] <- list(train=1:n_obs, test=numeric())
+    fold_info[n_folds+1, ] <- c(list(n_folds+1), rep("train", n_folds))
+  }
+
   attr(splits, "fold_info") <- fold_info
 
   return(splits)
@@ -22,11 +36,11 @@ cv <- function(data, n_folds=5, strata=NULL){
 #' @importFrom utils combn
 #' @importFrom magrittr set_colnames
 #' @importFrom splitTools partition
-extensive_cv <- function(data, n_folds=3, strata=NULL, incl_all_train = FALSE){
+extensive_cv <- function(data, n_folds=3, strata=NULL, include_all_train = FALSE){
 
   folds <- draw_folds(data=data, n_folds=n_folds, strata=strata)
 
-  fold_idx <- do.call(c, lapply(1:(n_folds-as.numeric(!incl_all_train)), \(x){
+  fold_idx <- do.call(c, lapply(1:(n_folds-as.numeric(!include_all_train)), \(x){
     utils::combn(1:n_folds, x, simplify=FALSE)
   })) %>%
     lapply(\(x) {list(train = x, test=setdiff(1:n_folds, x))})
@@ -50,7 +64,10 @@ extensive_cv <- function(data, n_folds=3, strata=NULL, incl_all_train = FALSE){
 
 
 
-draw_folds <- function(data, n_folds, strata){
+draw_folds <- function(data,
+                       n_folds,
+                       strata = NULL,
+                       fold_size=rep(1/n_folds, n_folds)){
   ## check args:
   stopifnot(is.data.frame(data))
   stopifnot(n_folds >= 2 & (n_folds %% 1 == 0))
@@ -69,5 +86,5 @@ draw_folds <- function(data, n_folds, strata){
   }
 
   ## conduct data splitting:
-  splitTools::partition(y=y, p=rep(1/n_folds, n_folds), type=type)
+  splitTools::partition(y=y, p=fold_size, type=type)
 }
