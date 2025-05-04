@@ -1,4 +1,8 @@
-valid_methods <- c("holdout", "cv", "extensive_cv")
+valid_methods <- c("none", "holdout", "cv", "extensive_cv")
+
+none <- function(data){
+  return(list())
+}
 
 holdout <- function(data, pr_test=0.2, strata=NULL){
 
@@ -10,25 +14,20 @@ holdout <- function(data, pr_test=0.2, strata=NULL){
 
 
 #' @importFrom splitTools partition
-cv <- function(data, n_folds=5, strata=NULL, include_all_train = FALSE){
+cv <- function(data, n_folds=5, strata=NULL){
 
   folds <- draw_folds(data=data, n_folds=n_folds, strata=strata)
   n_obs <- nrow(data)
   splits <- lapply(folds, function(x) list(train = setdiff(1:n_obs, x), test=x))
   names(splits) <- NULL
 
-  ## add fold_info attribute:
+  ## add info_folds attribute:
   fi <- matrix("train", n_folds, n_folds)
   fi[row(fi) == col(fi)] <- "test"
   colnames(fi) <- paste0("fold_", LETTERS[1:n_folds])
-  fold_info <- cbind(split_idx = 1:n_folds, as.data.frame(fi))
+  info_folds <- cbind(idx_split = 1:n_folds, as.data.frame(fi))
 
-  if(include_all_train){
-    splits[[length(splits)+1]] <- list(train=1:n_obs, test=numeric())
-    fold_info[n_folds+1, ] <- c(list(n_folds+1), rep("train", n_folds))
-  }
-
-  attr(splits, "fold_info") <- fold_info
+  attr(splits, "info_folds") <- info_folds
 
   return(splits)
 }
@@ -36,28 +35,28 @@ cv <- function(data, n_folds=5, strata=NULL, include_all_train = FALSE){
 #' @importFrom utils combn
 #' @importFrom magrittr set_colnames
 #' @importFrom splitTools partition
-extensive_cv <- function(data, n_folds=3, strata=NULL, include_all_train = FALSE){
+extensive_cv <- function(data, n_folds=3, strata=NULL){
 
   folds <- draw_folds(data=data, n_folds=n_folds, strata=strata)
 
-  fold_idx <- do.call(c, lapply(1:(n_folds-as.numeric(!include_all_train)), \(x){
+  idx_fold <- do.call(c, lapply(1:(n_folds-1), \(x){
     utils::combn(1:n_folds, x, simplify=FALSE)
   })) %>%
     lapply(\(x) {list(train = x, test=setdiff(1:n_folds, x))})
 
-  splits <- lapply(fold_idx, \(s){ sapply(s, \(x){ do.call(c, folds[x]) }) })
+  splits <- lapply(idx_fold, \(s){ sapply(s, \(x){ do.call(c, folds[x]) }) })
 
-  ## add fold_info attribute:
-  fi <- lapply(fold_idx, \(x){
+  ## add info_folds attribute:
+  fi <- lapply(idx_fold, \(x){
     y <- rep("train", n_folds)
     y[x$test] <- "test"
     y
   } )
   fi <- do.call(rbind, fi) %>%
     magrittr::set_colnames(paste0("fold_", LETTERS[1:n_folds]))
-  fold_info <- cbind(split_idx = 1:length(fold_idx), as.data.frame(fi))
+  info_folds <- cbind(idx_split = 1:length(idx_fold), as.data.frame(fi))
 
-  attr(splits, "fold_info") <- fold_info
+  attr(splits, "info_folds") <- info_folds
 
   return(splits)
 }

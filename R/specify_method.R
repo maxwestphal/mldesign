@@ -1,6 +1,7 @@
 derive_splits_method <- function(method, data){
-  do.call(method$method, args=c(list(data=data), method$args)) %>%
-    define_splits()
+  splits <- do.call(method$method, args=c(list(data=data), method$args))
+
+  define_splits(info=NULL, sets=NULL, splits=splits) %>% return()
 }
 
 

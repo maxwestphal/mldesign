@@ -1,6 +1,6 @@
 Package: mldesign
 Title: Meaningful (Estimand Based) Data Splitting in Applied Machine Learning
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person(given = "Max",
            family = "Westphal",
@@ -16,11 +16,14 @@ Imports:
     magrittr,
     methods,
     Matrix,
+    tidyr,
     dplyr,
     stringr,
     stringi,
     purrr,
-    splitTools
+    splitTools,
+    checkmate,
+    data.table
 Suggests: 
     knitr,
     rmarkdown,

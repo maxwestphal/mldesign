@@ -10,11 +10,12 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr filter
 #' @importFrom methods is
+#' @importFrom checkmate assert_class
 derive_splits <- function(spec, data){
 
   ## argument checks:
-  stopifnot(methods::is(data, "data.frame"))
-  stopifnot(methods::is(spec, "mldesign_spec"))
+  checkmate::assert_class(spec, "mldesign_spec")
+  checkmate::assert_class(data, "data.frame")
 
   if(methods::is(spec, "mldesign_estimand")){
     return( derive_splits_estimand(estimand=spec, data=data) )
@@ -22,6 +23,10 @@ derive_splits <- function(spec, data){
 
   if(methods::is(spec, "mldesign_method")){
     return( derive_splits_method(method=spec, data=data) )
+  }
+
+  if(methods::is(spec, "mldesign_nested")){
+    return( derive_splits_nested(nested=spec, data=data) )
   }
 
 }
@@ -55,14 +60,14 @@ derive_splits_estimand <- function(estimand, data){
 
 
   ## step 3 - for each training set, check training constraints:
-  eligible_train <- verify_train(define_splits(splits),
+  eligible_train <- verify_train(define_splits(info=NULL, sets=NULL, splits=splits),
                                  data = data,
                                  constraints = estimand$train)
 
   splits <- splits[eligible_train]
 
   ## step 4 - compile and return output:
-  define_splits(splits) %>% return()
+  define_splits(info=NULL, sets=NULL, splits=splits) %>% return()
 }
 
 
@@ -80,9 +85,9 @@ verify_train <-function(splits,
                         constraints,
                         details = FALSE){
 
-  eligible_train <- sapply(1:length(splits), function(idx){
+  eligible_train <- sapply(1:nrow(splits$info), function(idx){
     verify_train_1(data_train = get_train_set(data=data, splits=splits, idx=idx),
-                   constraints= constraints,
+                   constraints = constraints,
                    details = details)
   })
 
