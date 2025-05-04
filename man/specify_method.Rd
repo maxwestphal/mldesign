@@ -4,14 +4,16 @@
 \alias{specify_method}
 \title{Specify a data splitting method}
 \usage{
-specify_method(name, ..., default = FALSE)
+specify_method(method, ..., default = FALSE, name = method)
 }
 \arguments{
-\item{name}{(character) \cr name of the data splitting method}
+\item{method}{(character) \cr}
 
 \item{...}{(any) \cr named arguments to function name}
 
 \item{default}{(logical) \cr Should default arguments be used? (default: FALSE)}
+
+\item{name}{(character) \cr name of the data splitting method, equal to \code{method} by default.}
 }
 \value{
 an object of class \code{mldesign_method}

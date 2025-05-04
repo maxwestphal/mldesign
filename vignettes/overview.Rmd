@@ -115,7 +115,7 @@ names(data)
 head(data)
 ```
 
-Imagine we would want to apply our (trained) prediction model to predict the response variable only 
+Imagine we would want to apply our (trained) prediction model to predict the outcome variable only 
 to patients older than 50 years:
 
 ```{r}

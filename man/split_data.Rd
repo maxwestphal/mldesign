@@ -10,22 +10,22 @@
 \alias{get_test_set}
 \title{Split data}
 \usage{
-get_data_splits(data, splits, idx)
+get_data_splits(data, splits, idx = get_valid_idx(splits))
 
 get_data_split(data, splits, idx)
 
-get_train_sets(data, splits, idx)
+get_train_sets(data, splits, idx = get_valid_idx(splits))
 
 get_train_set(data, splits, idx)
 
-get_test_sets(data, splits, idx)
+get_test_sets(data, splits, idx = get_valid_idx(splits))
 
 get_test_set(data, splits, idx)
 
 split_data(
   data,
   splits,
-  idx,
+  idx = get_valid_idx(splits),
   set = c("both", "train", "test"),
   simplify = length(idx) == 1
 )

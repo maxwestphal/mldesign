@@ -1,6 +1,6 @@
 Package: mldesign
 Title: Meaningful (Estimand Based) Data Splitting in Applied Machine Learning
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: 
     person(given = "Max",
            family = "Westphal",
@@ -11,16 +11,19 @@ Description: Translate an estimand specification to an experimental design (data
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Imports: 
     magrittr,
     methods,
     Matrix,
+    tidyr,
     dplyr,
     stringr,
     stringi,
     purrr,
-    caret
+    splitTools,
+    checkmate,
+    data.table
 Suggests: 
     knitr,
     rmarkdown,

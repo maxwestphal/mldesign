@@ -4,7 +4,7 @@
 \alias{generate_data}
 \title{Generate synthetic data for testing purposes}
 \usage{
-generate_data(n_obs = 20000)
+generate_data(n_obs = 2000)
 }
 \arguments{
 \item{n_obs}{(numeric) \cr number of observations}
