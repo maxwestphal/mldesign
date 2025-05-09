@@ -51,4 +51,4 @@ dim(data)
 
 summary(data)
 
-# TODO: make this a function sample_data()
+

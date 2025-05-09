@@ -86,13 +86,13 @@ derive_splits_nested <- function(nested, data){
 
     info_folds <- NULL
 
-    # (1) add type='outer' split (subset=FALSE)
+    # (1) add type='outer' split
     split_new <- list(train = idx_outer_obs_train, test = idx_outer_obs_test)
     sets$train[[idx_train]] <- split_new$train
     sets$test[[idx_test]] <- split_new$test
     info[[length(info)+1]] <- get_split_info(split = split_new,
                                              idx_split, idx_outer, 0,
-                                             type = 'outer', subset=FALSE,
+                                             type = 'outer', type_test = "outer", type_train = "outer",
                                              idx_train, idx_test,
                                              info_folds = NULL)
 
@@ -115,23 +115,23 @@ derive_splits_nested <- function(nested, data){
       idx_inner_obs_test_rel <- get_splits(splits_inner, idx_inner)$test
       idx_inner_obs_test <- idx_outer_obs_train[idx_inner_obs_test_rel]
 
-      # (2) add type='outer' split (subset=TRUE):
+      # (2) add type='mixed' split:
       split_new <- list(train = idx_inner_obs_train, test = idx_outer_obs_test)
       sets$train[[idx_train]] <- split_new$train
       sets$test[[idx_test]] <- split_new$test
       info[[length(info)+1]] <- get_split_info(split = split_new,
                                                idx_split, idx_outer, idx_inner,
-                                               type = 'outer', subset=TRUE,
+                                               type = 'mixed', type_test = "outer", type_train = "inner",
                                                idx_train, idx_test,
                                                info_folds = info_folds[idx_inner,-1])
       idx_split <- idx_split + 1
 
-      # (3) add type='inner' split (subset=NA):
+      # (3) add type='inner' split:
       split_new <- list(train =  idx_inner_obs_train, test = idx_inner_obs_test)
       sets$test[[idx_test+delta_idx]] <- split_new$test
       info[[length(info)+1]] <- get_split_info(split = split_new,
                                                idx_split, idx_outer, idx_inner,
-                                               type = 'inner', subset=FALSE,
+                                               type = 'inner', type_test = "inner", type_train = "inner",
                                                idx_train, idx_test + delta_idx,
                                                info_folds = info_folds[idx_inner,-1])
 
@@ -158,7 +158,7 @@ derive_splits_nested <- function(nested, data){
 
 get_split_info <- function(split,
                            idx_split, idx_outer, idx_inner,
-                           type, subset, FALSE,
+                           type, type_test, type_train,
                            idx_train, idx_test,
                            info_folds){
 
@@ -167,8 +167,8 @@ get_split_info <- function(split,
     idx_outer = idx_outer,
     idx_inner = idx_inner,
     type = type,
-    subset = subset,
-    paired = FALSE,
+    type_test = type_test,
+    type_train =  type_train,
     idx_train = idx_train,
     idx_test = idx_test,
     n_train = length(split$train),

@@ -74,13 +74,13 @@ define_splits <- function(info=NULL, sets=NULL, splits){
       idx_split = seq_along(splits),
       idx_outer = seq_along(splits),
       idx_inner = 0,
-      type = NA,
-      subset = NA,
+      type = "outer",
+      type_test = "outer",
+      type_train = "outer",
       idx_train = seq_along(splits),
       idx_test = seq_along(splits) + length(splits),
       n_train = sapply(splits, \(x) length(x$train)),
-      n_test = sapply(splits, \(x) length(x$test)),
-      n_shared = sapply(splits, \(x) length(intersect(x$train, x$test)))
+      n_test = sapply(splits, \(x) length(x$test))
     )
 
   }

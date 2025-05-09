@@ -1,25 +1,28 @@
 # ISSUES (0.2.0) ------------------------------------------------------------------------------
 
-
-# TODO: Update README + new NEWS.md for changes via usethis::use_news_md()
-# ---> changes: nested data splitting, changed representation (info), ml3 options
-# TODO: Update vignette
-
-# TODO: ADD UNIT TESTS / Coverage
-
-
+# TODO: styler
 
 
 
 
 # ISSUES (0.3.0) ------------------------------------------------------------------------------
+
+# TODO: compatibility with rsample, tidymodels, ... (besides mlr3)
+
+# TODO: simplify (print of) splits$info for non-nested splits
+
+# TODO: fewer issues, move some to 0.4.0
+
+# TODO: pkgdown site
+
 # TODO: HP TUNING
 # TODO: STRATA FOR TEST SET (already working via strata = country (=estimand-defining vars))
 #       -> better would be to allow explicit definition a la "strata='idx_outer'"
 # https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html
 # MLR3 feature
 
-# TODO: specify_estimand: warning vs. error on EMPTY "relation" arg (empty rel = reproducibility)
+# TODO: specify_estimand: warning vs. error on EMPTY "relation" arg (empty rel = reproducibility),
+#       -> we need random splitting then...
 # TODO: better parsing of variable names, e.g. in case of "train$year)"
 # TODO: splitting functions cv, holdout, etc. should they be in dictonary instead of "global" funs?
 
@@ -31,13 +34,13 @@
 # TODO: sort out filter_split, expand_split, subset_split (which should be exported)
 # TODO: check that train set should be based on all points not only test_eligible
 
-# TODO: pkgdown site
+
 
 # TODO: add attributes to derive_split (like n_test_obs (included/excluded), n_train_sets)
 
 # TODO: Double check default args for 'methods' e.g. specify_method("cv") throws error- expeccted?
 
-# TODO: move data.table everywhere
+# TODO: use data.table everywhere?!?
 
 # TODO: re-organise/cleanup R folder
 # TODO: re-organise/cleanup unit tests
@@ -57,6 +60,7 @@
 # ISSUES (0.4.0) ------------------------------------------------------------------------------
 # -> FOR CRAN release: documentation, tests
 
+# TODO: besides
 
 # TODO: vignette for data augmentation (idx_obs, idx_origin)
 
@@ -77,11 +81,12 @@
 # TODO: examples for all exported functions
 # TODO: more unit tests
 
+# TODO: revision of "overview" vignette / UML diagram + clean up
 # TODO: 2nd vignette: more complex example, including (synthetic) heterogeneous dataset and ML,
 # different estimands
 # - simple ML: glmnet::cv.glmnet() (as inner data splitting is not yet implemented)
 
-# TODO: revision of "overview" vignette / UML diagram + clean up
+
 
 # TODO eval_constraint
 ## TODO: check if index set (i,j) can be optimized,

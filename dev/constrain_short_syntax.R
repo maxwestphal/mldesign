@@ -32,7 +32,6 @@
 #' @return mlguide_constraint
 #' @export
 #'
-#' @examples # TODO
 #' @importFrom stringr str_replace_all
 #' @importFrom stringr str_split_1
 #' @importFrom stringr str_extract

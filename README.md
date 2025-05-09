@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# {mldesign} - an R package for structured data splitting to facilitate estimand-aligned performance estimation in machine learning
+# {mldesign} - An R package for structured data splitting to facilitate estimand-aligned performance estimation in machine learning
 
 <!-- badges: start -->
 

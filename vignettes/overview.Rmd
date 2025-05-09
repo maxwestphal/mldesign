@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 library(kableExtra)
 library(mldesign)
 library(mlr3verse)
+library(ggplot2)
 ```
 
 
@@ -311,7 +312,7 @@ suppressMessages({
 learner_tuned
 ```
 
-Let's use the convenience function `get_mlr3_predictions`
+Let's use the convenience function `get_mlr3_predictions` to retreive predictions and label for all observations in all splits in a single data.frame.
 
 ```{r}
 predictions <- get_mlr3_predictions(splits=splits, instance=learner_tuned)
@@ -322,12 +323,14 @@ head(predictions)
 
 
 
-From here, we can calculate usual metrics of interest, e.g. the area under the ROC curve (AUC).
+From here, we can calculate any relevant metric of interest, e.g. the area under the ROC curve (AUC). 
+In the next step, we then select models based on the aggregate performance in the inner loop of the
+nested resampling.
 
 ```{r}
 data_benchmark <- 
-  predictions %>% 
-  derive_metrics(splits = splits, 
+  derive_metrics(predictions = predictions,
+                 splits = splits, 
                  auc = pROC::auc(truth, prob.1, direction="<", levels=c("0", "1")) %>% as.numeric()) %>% 
   select_models(metric = "auc", aggregate = mean, select = max)
 
@@ -335,15 +338,14 @@ tab(data_benchmark)
 ```
 
 
-To conclude, we make a simple visualization for the resulting benchmark data
+To conclude, we make a simple visualization for the resulting benchmark data. 
 
 ```{r}
-# TODO: visualize outer
+data_benchmark %>% 
+  ggplot(aes(type, auc, size=n_train, color=factor(idx_outer))) +
+  geom_point() + 
+  labs(size = bquote(n[train]), color=bquote(idx[outer]))
 ```
 
 
-
-```{r}
-# TODO: compare inner and outer for subset=TRUE
-```
 
