@@ -4,15 +4,15 @@
 \alias{get_mlr3_predictions}
 \title{Get predictions after a mlr3 training/tuning with an custom data splitting}
 \usage{
-get_mlr3_predictions(idx_model = NULL, splits, instance)
+get_mlr3_predictions(splits, instance, idx_model = NULL)
 }
 \arguments{
-\item{idx_model}{(NULL | numeric) \cr either NULL to select all models or an integer (vector) in the range
-1:instance$archive$n_evals}
-
 \item{splits}{(mldesign_splits) \cr ... TODO ...}
 
 \item{instance}{(...) \cr ... TODO: what classes are allowed? ...}
+
+\item{idx_model}{(NULL | numeric) \cr either NULL to select all models or an integer (vector) in the range
+1:instance$archive$n_evals}
 }
 \value{
 (data.table)

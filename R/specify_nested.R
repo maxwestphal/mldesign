@@ -158,7 +158,7 @@ derive_splits_nested <- function(nested, data){
 
 get_split_info <- function(split,
                            idx_split, idx_outer, idx_inner,
-                           type, subset,
+                           type, subset, FALSE,
                            idx_train, idx_test,
                            info_folds){
 
@@ -168,11 +168,11 @@ get_split_info <- function(split,
     idx_inner = idx_inner,
     type = type,
     subset = subset,
+    paired = FALSE,
     idx_train = idx_train,
     idx_test = idx_test,
     n_train = length(split$train),
-    n_test = length(split$test),
-    n_shared = length(intersect(split$train, split$test))
+    n_test = length(split$test)
   )
 
   if(!is.null(info_folds)){

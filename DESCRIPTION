@@ -13,6 +13,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
+    rlang,
     magrittr,
     methods,
     Matrix,
@@ -26,11 +27,17 @@ Imports:
     data.table
 Suggests: 
     knitr,
+    kableExtra,
     rmarkdown,
     testthat (>= 3.0.0),
     covr,
     badger,
-    nomnoml
+    nomnoml,
+    mlr3verse,
+    mlr3tuning,
+    mlr3tuningspaces,
+    ranger,
+    pROC
 VignetteBuilder: knitr, rmarkdown
 Config/testthat/edition: 3
 URL: https://github.com/maxwestphal/mldesign

@@ -2,168 +2,24 @@
 
 
 # TODO: Update README + new NEWS.md for changes via usethis::use_news_md()
-# ---> changes: nested data splitting, changed representation
+# ---> changes: nested data splitting, changed representation (info), ml3 options
 # TODO: Update vignette
 
-# TODO: check all below
-# TODO: check def of variable "subset" in <mldesign_split>$info
+# TODO: ADD UNIT TESTS / Coverage
 
-# TODO:
-# based on get_info(splits), combine splits with identical idx_train
-# introduce grouping variable idx_split (idx_test)
-
-# TODO: HP TUNING
-# TODO: STRATA FOR TEST SET
-# https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html
-# MLR3 feature
-
-# TODO: train
-# TODO: score/eval (grouped)
-# -> see: https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html
-
-# TODO: ADD UNIT TESTS
-# TODO: DELETE CODE BELOW, UPDATE ISSUES FOR 0.3.0
-
-
-
-library(mlr3verse)
-library(mlr3tuningspaces)
-
-set.seed(123)
-data <- generate_data(2000)
-spec <- specify_estimand(co(~train$country != test$country))
-
-splits <- derive_splits(spec, data)
-splits <- derive_splits(nest(spec), data)
-
-
-# Create a task
-task <- mlr3::as_task_classif(response~age+comorbidity, data=data)
-#task$set_col_roles("country", "stratum") # TODO: add column with idx_split ------------------------------------------------------
-task$col_roles
-
-
-train_sets <- get_splits(splits, set="train")
-test_sets <- get_splits(splits, set="test")
-
-# Instantiate Resampling
-resampling <- rsmp("custom")
-resampling$instantiate(task, train_sets, test_sets)
-resampling$train_set(1)
-resampling$test_set(1)
-
-
-mlr3::mlr_learners
-#mlr3::mlr_learners$items$classif.glmnet
-#mlr3::mlr_learners$items$classif.cv_glmnet
-learner <- mlr3::lrn("classif.ranger", predict_type = "prob")
-
-
-set.seed(1337)
-instance = tune(
-  tnr("random_search"),
-  task = task,
-  learner = learner,
-  resampling = resampling,
-  measure = msr("classif.auc"),
-  term_evals = 7
-)
-
-splits$info
-
-instance
-instance$archive$predictions(7)
-
-
-# ---------------------------------------------------------------------------------------------
-
-
-
-
-
-
-# Version 2 converted sets --------------------------------------------------------------------
-
-
-
-
-
-
-
-set.seed(123)
-data <- generate_data(2000)
-spec <- specify_estimand(co(~train$country != test$country))
-
-
-
-splits <- derive_splits(spec, data)
-splits %>% get_sets()
-splits$sets <- get_sets(splits)
-splits <- splits %>% add_mlr3_vars()
-#splits <- derive_splits(nest(spec), data) %>% add_mlr3_vars()
-str(splits, 2)
-str(splits$mlr3$sets$test)
-
-
-# Create a task
-task <- mlr3::as_task_classif(outcome~age+comorbidity, data=data)
-#task$set_col_roles("country", "stratum") # TODO: add column with idx_split ------------------------------------------------------
-task$col_roles
-
-
-# Instantiate Resampling
-resampling <- rsmp("custom")
-resampling$instantiate(task, get_mlr3_sets_train(splits), get_mlr3_sets_test(splits))
-resampling$train_set(1)
-resampling$test_set(1)
-
-
-mlr3::mlr_learners
-#mlr3::mlr_learners$items$classif.glmnet
-#mlr3::mlr_learners$items$classif.cv_glmnet
-learner <- mlr3::lrn("classif.ranger", predict_type = "prob")
-
-
-set.seed(1337)
-instance = tune(
-  tnr("random_search"),
-  task = task,
-  learner = learner,
-  resampling = resampling,
-  measure = msr("classif.auc"),
-  term_evals = 7
-)
-
-?mlr3::PredictionClassif
-
-xx <- instance$archive$predictions(1)
-mlr3measures::auc(xx)
-
-splits_mlr3$map
-
-instance
-instance$archive$predictions(7)
-
-splits
-
-preds <- get_mlr3_predictions(NULL, splits, instance)
-
-preds %>%
-  dplyr::group_by(idx_model, idx_split) %>%
-  dplyr::summarize(acc = mlr3measures::acc(truth, response),
-                   bacc = mlr3measures::bacc(truth, response),
-                   auc = mlr3measures::auc(truth, prob.1, "1"))
-
-
-
-# pROC::auc(pROC::roc(response=truth, predictor=prob.1))
 
 
 
 
 
 # ISSUES (0.3.0) ------------------------------------------------------------------------------
-# TODO: specify_estimand: warning vs. error on EMPTY "relation" arg
+# TODO: HP TUNING
+# TODO: STRATA FOR TEST SET (already working via strata = country (=estimand-defining vars))
+#       -> better would be to allow explicit definition a la "strata='idx_outer'"
+# https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html
+# MLR3 feature
+
+# TODO: specify_estimand: warning vs. error on EMPTY "relation" arg (empty rel = reproducibility)
 # TODO: better parsing of variable names, e.g. in case of "train$year)"
 # TODO: splitting functions cv, holdout, etc. should they be in dictonary instead of "global" funs?
 
@@ -188,7 +44,9 @@ preds %>%
 
 # TODO: overhaul/optimize all function names
 
-
+# TODO: train
+# TODO: score/eval (grouped)
+# -> see: https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html
 
 
 
