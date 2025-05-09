@@ -14,21 +14,27 @@
 #'
 #'
 #' @export
-get_mlr3_predictions <- function(splits, instance, idx_model=NULL){
-  if(is.null(idx_model)){idx_model <- 1:instance$archive$n_evals}
-  lapply(idx_model, \(i) cbind(idx_model=i, get_mlr3_predictions_1(i, splits, instance))) %>%
+get_mlr3_predictions <- function(splits, instance, idx_model = NULL) {
+  if (is.null(idx_model)) {
+    idx_model <- 1:instance$archive$n_evals
+  }
+  lapply(idx_model, \(i) cbind(idx_model = i, get_mlr3_predictions_1(i, splits, instance))) %>%
     data.table::rbindlist() %>%
     return()
 }
 
 #' @importFrom data.table as.data.table
 #' @importFrom data.table rbindlist
-get_mlr3_predictions_1 <- function(idx_model=1, splits, instance){
+get_mlr3_predictions_1 <- function(idx_model = 1, splits, instance) {
   map <- get_mlr3_map(splits)
-  lapply(seq_along(map),
-         \(i) cbind(map[[i]],
-                    instance$archive$predictions(idx_model)[[i]] %>%
-                      data.table::as.data.table() )) %>%
+  lapply(
+    seq_along(map),
+    \(i) cbind(
+      map[[i]],
+      instance$archive$predictions(idx_model)[[i]] %>%
+        data.table::as.data.table()
+    )
+  ) %>%
     data.table::rbindlist() %>%
     return()
 }

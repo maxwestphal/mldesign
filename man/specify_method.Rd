@@ -22,8 +22,10 @@ an object of class \code{mldesign_method}
 Specify a data splitting method
 }
 \examples{
-\dontrun{specify_method()}
+\dontrun{
+specify_method()
+}
 specify_method("cv")
-specify_method("cv", default=TRUE)
-specify_method("cv", n_folds=10)
+specify_method("cv", default = TRUE)
+specify_method("cv", n_folds = 10)
 }

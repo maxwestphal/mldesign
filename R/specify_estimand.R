@@ -14,35 +14,24 @@
 #' @export
 #' @examples
 #' estimand <- specify_estimand(cc(
-#' "(test[['year']] - train[['year']]) %in% 1:2 #name=time_transferability #type=context",
-#' "test[['country']] != train[['country']] #name=region_transferability #type=context"
+#'   "(test[['year']] - train[['year']]) %in% 1:2 #name=time_transferability #type=context",
+#'   "test[['country']] != train[['country']] #name=region_transferability #type=context"
 #' ))
-specify_estimand <-  function(...,
-                              constraints = cc(),
-                              name = NA
-){
-
+specify_estimand <- function(...,
+                             constraints = cc(),
+                             name = NA) {
   stopifnot(is.character(name) | is.na(name))
   stopifnot(length(name) == 1)
 
   constraints <- c(list(...), constraints)
 
   ## parse constraints if needed:
-  cl <- combine_constraints(constraints=constraints) %>% split_constraints(by="target")
+  cl <- combine_constraints(constraints = constraints) %>% split_constraints(by = "target")
 
-  if(length(cl$relation) == 0){
+  if (length(cl$relation) == 0) {
     stop("[mldesign] no constraint with target 'relation' specified, see '?constrain'!")
   }
 
   ## compile and return output:
-  define_estimand(name=name, test=cl$test, relation=cl$relation, train=cl$train)
+  define_estimand(name = name, test = cl$test, relation = cl$relation, train = cl$train)
 }
-
-
-
-
-
-
-
-
-

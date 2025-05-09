@@ -12,15 +12,11 @@
 derive_metrics <- function(predictions,
                            splits,
                            ...,
-                           by = c("idx_split", "idx_model")){
-
+                           by = c("idx_split", "idx_model")) {
   . <- NULL
 
   predictions %>%
     dplyr::group_by_at(by) %>%
     dplyr::reframe(...) %>%
-    dplyr::left_join(get_info(splits), ., by=by[1])
-
+    dplyr::left_join(get_info(splits), ., by = by[1])
 }
-
-

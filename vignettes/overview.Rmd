@@ -27,17 +27,16 @@ library(ggplot2)
 ```{r, include=FALSE}
 options(kableExtra.html.bsTable = TRUE)
 
-tab <- function(x){
-  x %>% 
+tab <- function(x) {
+  x %>%
     kbl() %>%
-    kable_styling(bootstrap_options = c("striped", "hover")) %>% 
+    kable_styling(bootstrap_options = c("striped", "hover")) %>%
     scroll_box(height = "400px")
 }
 
-tab_splits <- function(x){
+tab_splits <- function(x) {
   x$info %>% tab()
 }
-
 ```
 
 
@@ -130,7 +129,7 @@ library(nomnoml)
 Generate some data for demonstration purposes
 ```{r}
 set.seed(1337)
-data <- generate_data(n_obs=2000)
+data <- generate_data(n_obs = 2000)
 names(data)
 head(data)
 ```
@@ -149,7 +148,7 @@ but can be overwritten via (e.g.) `constrain(..., vars = "age")`.
 We can define further (optional) information. This will not affect results down the line but 
 will improve documentation
 ```{r}
-constrain(~ test$age > 50, name="ic_age", type="population")
+constrain(~ test$age > 50, name = "ic_age", type = "population")
 ```
 
 Note that we can specify the same constraint in a single character object with help of the parse_constraint function:
@@ -176,19 +175,23 @@ specification and our entire dataset **data**.
 
 ```{r}
 constraints_relation <- cc(
-  constrain(~ (test[['year']] - train[['year']]) %in% 1:2,
-            name="time_transferability", type="context"),
-  constrain(~ test[['country']] != train[['country']],
-            name="region_transferability", type="context")
-) 
+  constrain(~ (test[["year"]] - train[["year"]]) %in% 1:2,
+    name = "time_transferability", type = "context"
+  ),
+  constrain(~ test[["country"]] != train[["country"]],
+    name = "region_transferability", type = "context"
+  )
+)
 ```
 
 ```{r}
 constraints_relation %>% str(2)
 ```
 ```{r}
-my_estimand <- specify_estimand(constraints = constraints_relation,
-                                name = "my_estimand")
+my_estimand <- specify_estimand(
+  constraints = constraints_relation,
+  name = "my_estimand"
+)
 my_estimand
 ```
 
@@ -200,7 +203,7 @@ my_estimand
 Now, we use the estimand to conduct (deterministically) the corresponding data splitting:
 
 ```{r}
-splits <- derive_splits(my_estimand, data) 
+splits <- derive_splits(my_estimand, data)
 ```
 
 ```{r}
@@ -210,7 +213,7 @@ As we can see, we obtain a list of train/test indices corresponding to the estim
 To finally obtain concrete train/test sets (the first one out of the overall list):
 
 ```{r}
-split_data(data, splits, idx=1) %>% str()
+split_data(data, splits, idx = 1) %>% str()
 ```
 
 
@@ -224,9 +227,9 @@ nested cross-validation technique. In fact, let's start by defining the conventi
 
 ```{r}
 nest(
-  specify_method("cv", n_folds=5),
-  specify_method("cv", n_folds=5)
-) %>% 
+  specify_method("cv", n_folds = 5),
+  specify_method("cv", n_folds = 5)
+) %>%
   derive_splits(data) %>%
   tab_splits()
 ```
@@ -236,9 +239,9 @@ In addition, we can define a structured nested scheme as follows:
 ```{r}
 nest(
   my_estimand,
-  specify_method("cv", n_folds=3)
-) %>% 
-  derive_splits(data) %>% 
+  specify_method("cv", n_folds = 3)
+) %>%
+  derive_splits(data) %>%
   tab_splits()
 ```
 
@@ -256,12 +259,12 @@ Let's do this within the great [mlr3](https://mlr3.mlr-org.com/) framework. To a
 we will utilize the custom resampling scheme in {mlr3} via `rsmp("custom")`.
 
 ```{r}
-splits <- 
+splits <-
   nest(
-    specify_estimand(co(~ test[['country']] != train[['country']])),
-    specify_method("cv", n_folds=3)
-  ) %>% 
-  derive_splits(data) %>% 
+    specify_estimand(co(~ test[["country"]] != train[["country"]])),
+    specify_method("cv", n_folds = 3)
+  ) %>%
+  derive_splits(data) %>%
   add_mlr3_vars()
 
 str(splits, 1)
@@ -282,14 +285,16 @@ This implies that there are `r nrow(splits$info)` splits here which are 'condens
 
 ```{r, message=FALSE}
 task <- as_task_classif(data %>% dplyr::select(age, comorbidity, outcome),
-                        target = "outcome",
-                        positive = "1",
-                        id = "example_task")
+  target = "outcome",
+  positive = "1",
+  id = "example_task"
+)
 
 exp_design <- rsmp("custom")
 exp_design$instantiate(task,
-                       train_sets = get_mlr3_sets_train(splits),
-                       test_sets = get_mlr3_sets_test(splits))
+  train_sets = get_mlr3_sets_train(splits),
+  test_sets = get_mlr3_sets_test(splits)
+)
 
 tune_space <- mlr3tuningspaces::lts("classif.ranger.default")
 learner <- tune_space$get_learner()
@@ -301,7 +306,7 @@ search_space <- learner$param_set$search_space()
 set.seed(123)
 suppressMessages({
   learner_tuned <- mlr3tuning::tune(
-    tuner = tnr("random_search"), 
+    tuner = tnr("random_search"),
     task = task,
     learner = learner,
     resampling = exp_design,
@@ -315,7 +320,7 @@ learner_tuned
 Let's use the convenience function `get_mlr3_predictions` to retreive predictions and label for all observations in all splits in a single data.frame.
 
 ```{r}
-predictions <- get_mlr3_predictions(splits=splits, instance=learner_tuned)
+predictions <- get_mlr3_predictions(splits = splits, instance = learner_tuned)
 dim(predictions)
 head(predictions)
 ```
@@ -328,10 +333,12 @@ In the next step, we then select models based on the aggregate performance in th
 nested resampling.
 
 ```{r}
-data_benchmark <- 
-  derive_metrics(predictions = predictions,
-                 splits = splits, 
-                 auc = pROC::auc(truth, prob.1, direction="<", levels=c("0", "1")) %>% as.numeric()) %>% 
+data_benchmark <-
+  derive_metrics(
+    predictions = predictions,
+    splits = splits,
+    auc = pROC::auc(truth, prob.1, direction = "<", levels = c("0", "1")) %>% as.numeric()
+  ) %>%
   select_models(metric = "auc", aggregate = mean, select = max)
 
 tab(data_benchmark)
@@ -341,10 +348,10 @@ tab(data_benchmark)
 To conclude, we make a simple visualization for the resulting benchmark data. 
 
 ```{r}
-data_benchmark %>% 
-  ggplot(aes(type, auc, size=n_train, color=factor(idx_outer))) +
-  geom_point() + 
-  labs(size = bquote(n[train]), color=bquote(idx[outer]))
+data_benchmark %>%
+  ggplot(aes(type, auc, size = n_train, color = factor(idx_outer))) +
+  geom_point() +
+  labs(size = bquote(n[train]), color = bquote(idx[outer]))
 ```
 
 
