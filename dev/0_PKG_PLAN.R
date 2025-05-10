@@ -1,5 +1,7 @@
 # ISSUES (0.3.0) ------------------------------------------------------------------------------
 
+# TODO: INCREASE VERSION
+
 # TODO: compatibility with rsample, tidymodels, ... (besides mlr3)
 
 # TODO: simplify (print of) splits$info for non-nested splits
@@ -73,6 +75,8 @@
 
 # TODO: examples for all exported functions
 # TODO: more unit tests
+
+# TODO:
 
 # TODO: revision of "overview" vignette / UML diagram + clean up
 # TODO: 2nd vignette: more complex example, including (synthetic) heterogeneous dataset and ML,
