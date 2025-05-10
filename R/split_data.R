@@ -23,38 +23,38 @@
 #' @export
 get_data_splits <- function(data,
                             splits,
-                            idx=get_valid_idx(splits)){
-  split_data_internal(data, splits, idx, set="both", simplify=FALSE)
+                            idx = get_valid_idx(splits)) {
+  split_data_internal(data, splits, idx, set = "both", simplify = FALSE)
 }
 
 #' @rdname split_data
 #' @export
-get_data_split <- function(data, splits, idx){
-  split_data_internal(data, splits, idx, set="both", simplify=TRUE, idx_length=1)
+get_data_split <- function(data, splits, idx) {
+  split_data_internal(data, splits, idx, set = "both", simplify = TRUE, idx_length = 1)
 }
 
 #' @rdname split_data
 #' @export
-get_train_sets <- function(data, splits, idx=get_valid_idx(splits)){
-  split_data_internal(data, splits, idx, set="train", simplify=FALSE)
+get_train_sets <- function(data, splits, idx = get_valid_idx(splits)) {
+  split_data_internal(data, splits, idx, set = "train", simplify = FALSE)
 }
 
 #' @rdname split_data
 #' @export
-get_train_set <- function(data, splits, idx){
-  split_data_internal(data, splits, idx, set="train", simplify=TRUE, idx_length=1)
+get_train_set <- function(data, splits, idx) {
+  split_data_internal(data, splits, idx, set = "train", simplify = TRUE, idx_length = 1)
 }
 
 #' @rdname split_data
 #' @export
-get_test_sets <- function(data, splits, idx=get_valid_idx(splits)){
-  split_data_internal(data, splits, idx, set="test", simplify=FALSE)
+get_test_sets <- function(data, splits, idx = get_valid_idx(splits)) {
+  split_data_internal(data, splits, idx, set = "test", simplify = FALSE)
 }
 
 #' @rdname split_data
 #' @export
-get_test_set <- function(data, splits, idx){
-  split_data_internal(data, splits, idx, set="test", simplify=TRUE, idx_length=1)
+get_test_set <- function(data, splits, idx) {
+  split_data_internal(data, splits, idx, set = "test", simplify = TRUE, idx_length = 1)
 }
 
 
@@ -64,10 +64,8 @@ split_data <- function(data,
                        splits,
                        idx = get_valid_idx(splits),
                        set = c("both", "train", "test"),
-                       simplify = length(idx) == 1){
-
+                       simplify = length(idx) == 1) {
   split_data_internal(data, splits, idx, set, simplify)
-
 }
 
 
@@ -77,7 +75,7 @@ split_data <- function(data,
 #'
 #' @return (numeric) \cr a vector with valid indices
 #' @export
-get_valid_idx <- function(splits){
+get_valid_idx <- function(splits) {
   1:nrow(splits$info)
 }
 
@@ -87,47 +85,46 @@ split_data_internal <- function(data,
                                 idx,
                                 set = c("both", "train", "test"),
                                 simplify = length(idx) == 1,
-                                idx_length = 1:length(get_valid_idx(splits))){
-
+                                idx_length = 1:length(get_valid_idx(splits))) {
   set <- match.arg(set)
-  check_splits_data_args(data = data, splits=splits, idx=idx,
-                        set=set, simplify=simplify, idx_length=idx_length)
+  check_splits_data_args(
+    data = data, splits = splits, idx = idx,
+    set = set, simplify = simplify, idx_length = idx_length
+  )
 
   splits <- get_splits(splits)
 
   result <-
-    lapply(idx, function(i){
-
-      if(set == "both"){
+    lapply(idx, function(i) {
+      if (set == "both") {
         return(
           list(
-            train = data[ splits[[i]]$train, ],
-            test  = data[ splits[[i]]$test,  ]
+            train = data[splits[[i]]$train, ],
+            test  = data[splits[[i]]$test, ]
           )
         )
       }
 
-      if(set == "train"){
+      if (set == "train") {
         return(
-          data[ splits[[i]]$train, ]
+          data[splits[[i]]$train, ]
         )
       }
 
-      if(set == "test"){
+      if (set == "test") {
         return(
-          data[ splits[[i]]$test, ]
+          data[splits[[i]]$test, ]
         )
       }
 
       stop("argument set should be 'both', 'train' or 'test'")
-  })
+    })
 
-  if(simplify){
+  if (simplify) {
     result <- result[[1]]
   }
 
   return(result)
-
 }
 
 
@@ -136,8 +133,8 @@ check_splits_data_args <- function(data,
                                    idx,
                                    set = c("both", "train", "test"),
                                    simplify = length(idx) == 1,
-                                   idx_length = 1:length(get_valid_idx(splits))){
-  if(missing(idx)){
+                                   idx_length = 1:length(get_valid_idx(splits))) {
+  if (missing(idx)) {
     message("[mldesign] argument idx is missing - valid idx values are listed below")
     return(get_valid_idx(splits))
   }
@@ -147,7 +144,7 @@ check_splits_data_args <- function(data,
   stopifnot(is.numeric(idx))
 
   stopifnot(is.logical(simplify))
-  stopifnot(! (length(idx) > 1 & simplify) )
+  stopifnot(!(length(idx) > 1 & simplify))
 
   stopifnot(is.numeric(idx_length))
 
@@ -155,8 +152,4 @@ check_splits_data_args <- function(data,
   stopifnot(idx %in% get_valid_idx(splits))
 
   return(invisible(TRUE))
-
 }
-
-
-

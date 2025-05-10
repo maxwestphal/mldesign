@@ -1,5 +1,5 @@
 Package: mldesign
-Title: Meaningful (Estimand Based) Data Splitting in Applied Machine Learning
+Title: An R package for structured data splitting to facilitate estimand-aligned performance estimation in machine learning
 Version: 0.2.0
 Authors@R: 
     person(given = "Max",
@@ -26,11 +26,18 @@ Imports:
     data.table
 Suggests: 
     knitr,
+    kableExtra,
     rmarkdown,
     testthat (>= 3.0.0),
     covr,
     badger,
-    nomnoml
+    nomnoml,
+    mlr3verse,
+    mlr3tuning,
+    mlr3tuningspaces,
+    ranger,
+    pROC,
+    ggplot2
 VignetteBuilder: knitr, rmarkdown
 Config/testthat/edition: 3
 URL: https://github.com/maxwestphal/mldesign

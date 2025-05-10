@@ -24,7 +24,7 @@ Specify a nested design
 }
 \examples{
 nest(
-specify_estimand(constrain(~train$country != test$country)),
-specify_method("cv", n_folds=5)
+  specify_estimand(constrain(~ train$country != test$country)),
+  specify_method("cv", n_folds = 5)
 )
 }

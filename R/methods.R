@@ -1,12 +1,11 @@
 valid_methods <- c("none", "holdout", "cv", "extensive_cv")
 
-none <- function(data){
+none <- function(data) {
   return(list())
 }
 
-holdout <- function(data, pr_test=0.2, strata=NULL){
-
-  folds <- draw_folds(data, n_folds=2, strata=strata, fold_size = c(1-pr_test, pr_test))
+holdout <- function(data, pr_test = 0.2, strata = NULL) {
+  folds <- draw_folds(data, n_folds = 2, strata = strata, fold_size = c(1 - pr_test, pr_test))
   names(folds) <- c("train", "test")
 
   return(list(folds))
@@ -14,11 +13,10 @@ holdout <- function(data, pr_test=0.2, strata=NULL){
 
 
 #' @importFrom splitTools partition
-cv <- function(data, n_folds=5, strata=NULL){
-
-  folds <- draw_folds(data=data, n_folds=n_folds, strata=strata)
+cv <- function(data, n_folds = 5, strata = NULL) {
+  folds <- draw_folds(data = data, n_folds = n_folds, strata = strata)
   n_obs <- nrow(data)
-  splits <- lapply(folds, function(x) list(train = setdiff(1:n_obs, x), test=x))
+  splits <- lapply(folds, function(x) list(train = setdiff(1:n_obs, x), test = x))
   names(splits) <- NULL
 
   ## add info_folds attribute:
@@ -35,23 +33,28 @@ cv <- function(data, n_folds=5, strata=NULL){
 #' @importFrom utils combn
 #' @importFrom magrittr set_colnames
 #' @importFrom splitTools partition
-extensive_cv <- function(data, n_folds=3, strata=NULL){
+extensive_cv <- function(data, n_folds = 3, strata = NULL) {
+  folds <- draw_folds(data = data, n_folds = n_folds, strata = strata)
 
-  folds <- draw_folds(data=data, n_folds=n_folds, strata=strata)
-
-  idx_fold <- do.call(c, lapply(1:(n_folds-1), \(x){
-    utils::combn(1:n_folds, x, simplify=FALSE)
+  idx_fold <- do.call(c, lapply(1:(n_folds - 1), \(x){
+    utils::combn(1:n_folds, x, simplify = FALSE)
   })) %>%
-    lapply(\(x) {list(train = x, test=setdiff(1:n_folds, x))})
+    lapply(\(x) {
+      list(train = x, test = setdiff(1:n_folds, x))
+    })
 
-  splits <- lapply(idx_fold, \(s){ sapply(s, \(x){ do.call(c, folds[x]) }) })
+  splits <- lapply(idx_fold, \(s){
+    sapply(s, \(x){
+      do.call(c, folds[x])
+    })
+  })
 
   ## add info_folds attribute:
   fi <- lapply(idx_fold, \(x){
     y <- rep("train", n_folds)
     y[x$test] <- "test"
     y
-  } )
+  })
   fi <- do.call(rbind, fi) %>%
     magrittr::set_colnames(paste0("fold_", LETTERS[1:n_folds]))
   info_folds <- cbind(idx_split = 1:length(idx_fold), as.data.frame(fi))
@@ -66,7 +69,7 @@ extensive_cv <- function(data, n_folds=3, strata=NULL){
 draw_folds <- function(data,
                        n_folds,
                        strata = NULL,
-                       fold_size=rep(1/n_folds, n_folds)){
+                       fold_size = rep(1 / n_folds, n_folds)) {
   ## check args:
   stopifnot(is.data.frame(data))
   stopifnot(n_folds >= 2 & (n_folds %% 1 == 0))
@@ -74,16 +77,16 @@ draw_folds <- function(data,
   ## prepare data splitting:
   n_obs <- nrow(data)
 
-  if(!is.null(strata)){
-    stopifnot(length(strata)==1)
+  if (!is.null(strata)) {
+    stopifnot(length(strata) == 1)
     stopifnot(strata %in% names(data))
     y <- data[, strata]
     type <- "stratified"
-  }else{
+  } else {
     y <- 1:n_obs
     type <- "basic"
   }
 
   ## conduct data splitting:
-  splitTools::partition(y=y, p=fold_size, type=type)
+  splitTools::partition(y = y, p = fold_size, type = type)
 }

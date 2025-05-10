@@ -39,7 +39,7 @@ co(
 A short description...
 }
 \examples{
-constrain("test$age > 18", type="population")
-constrain(~ (test$year - train$year) \%>\% dplyr::between(1,3), type="context")
+constrain("test$age > 18", type = "population")
+constrain(~ (test$year - train$year) \%>\% dplyr::between(1, 3), type = "context")
 constrain("nrow(train) > 100")
 }

@@ -23,6 +23,6 @@ NULL
 #' @param lhs (any) \cr an R object
 #' @param rhs (any) \cr an R object such that \code{c(lhs, rhs)} is defined, usually of same class as \code{lhs}.
 #' @return The result of calling `c(lhs, rhs)`.
-`%,%` <- function(lhs, rhs){
+`%,%` <- function(lhs, rhs) {
   return(c(lhs, rhs))
 }

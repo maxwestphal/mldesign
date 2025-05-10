@@ -21,35 +21,35 @@ NULL
 
 #' @rdname get_mlr3_
 #' @export
-get_mlr3_sets_train <- function(splits){
+get_mlr3_sets_train <- function(splits) {
   get_mlr3_vars(splits)$sets$train
 }
 
 #' @rdname get_mlr3_
 #' @export
-get_mlr3_sets_test <- function(splits){
+get_mlr3_sets_test <- function(splits) {
   get_mlr3_vars(splits)$sets$test
 }
 
 #' @rdname get_mlr3_
 #' @export
-get_mlr3_sets <- function(splits){
+get_mlr3_sets <- function(splits) {
   get_mlr3_vars(splits)$sets
 }
 
 #' @rdname get_mlr3_
 #' @export
-get_mlr3_map <- function(splits){
+get_mlr3_map <- function(splits) {
   get_mlr3_vars(splits)$map
 }
 
 #' @rdname get_mlr3_
 #' @export
-get_mlr3_vars <- function(splits){
-  if(is.null(splits$mlr3)){
+get_mlr3_vars <- function(splits) {
+  if (is.null(splits$mlr3)) {
     message("[mldesign] deriving mlr3 variables - see `?add_mlr3_vars` to avoid repetition of this step...")
     return(derive_mlr3_vars(splits))
-  }else{
+  } else {
     return(splits$mlr3)
   }
 }

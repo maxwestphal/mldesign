@@ -25,7 +25,7 @@ define an estimand by a set of constraints.
 }
 \examples{
 estimand <- specify_estimand(cc(
-"(test[['year']] - train[['year']]) \%in\% 1:2 #name=time_transferability #type=context",
-"test[['country']] != train[['country']] #name=region_transferability #type=context"
+  "(test[['year']] - train[['year']]) \%in\% 1:2 #name=time_transferability #type=context",
+  "test[['country']] != train[['country']] #name=region_transferability #type=context"
 ))
 }

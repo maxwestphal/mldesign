@@ -1,6 +1,6 @@
 test_that("testing derive_splits()", {
   set.seed(123)
-  data <- generate_data(n_obs=10000)
+  data <- generate_data(n_obs = 10000)
 
 
   # data splitting based on estimand ------------------------------------------------------------
@@ -26,7 +26,7 @@ test_that("testing derive_splits()", {
 
 
   # data splitting based on (conventional) method -----------------------------------------------
-  method <- specify_method("cv", default=TRUE)
+  method <- specify_method("cv", default = TRUE)
   splits_m <- derive_splits(method, data)
 
   expect_s3_class(method, "mldesign_spec")
@@ -35,7 +35,7 @@ test_that("testing derive_splits()", {
   expect_equal(nrow(get_info(splits_m)), 5)
 
   # data splitting based on (conventional) method -----------------------------------------------
-  method <- specify_method("extensive_cv", default=TRUE)
+  method <- specify_method("extensive_cv", default = TRUE)
   splits_m <- derive_splits(method, data)
 
   expect_s3_class(method, "mldesign_spec")
@@ -58,7 +58,7 @@ test_that("testing derive_splits()", {
   # data splitting based on nested design -------------------------------------------------------
   # case 2: outer = inner (method)
   nested <- specify_nested(
-    outer = specify_method("cv", n_folds=5)
+    outer = specify_method("cv", n_folds = 5)
   )
   splits_n <- derive_splits(nested, data)
 
@@ -84,7 +84,7 @@ test_that("testing derive_splits()", {
   # case 4: outer (estimand) != inner (method)
   nested <- specify_nested(
     outer = specify_estimand("test$country != train$country"),
-    inner = specify_method("cv", n_folds=5)
+    inner = specify_method("cv", n_folds = 5)
   )
   splits_n <- derive_splits(nested, data)
 
@@ -92,7 +92,4 @@ test_that("testing derive_splits()", {
   expect_s3_class(nested, "mldesign_nested")
   expect_s3_class(splits_n, "mldesign_splits")
   expect_length(get_splits(splits_n), 44)
-
 })
-
-
