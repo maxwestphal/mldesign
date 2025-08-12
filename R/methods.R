@@ -44,7 +44,7 @@ extensive_cv <- function(data, n_folds = 3, strata = NULL) {
     })
 
   splits <- lapply(idx_fold, \(s){
-    sapply(s, \(x){
+    lapply(s, \(x){
       do.call(c, folds[x])
     })
   })
